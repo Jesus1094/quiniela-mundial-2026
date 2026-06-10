@@ -13,10 +13,6 @@ export async function registrar(
   _prev: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
-  if (corteAlcanzado()) {
-    return { error: "El registro está cerrado: el torneo ya comenzó." };
-  }
-
   const nombre = String(formData.get("nombre") ?? "").trim();
   const email = String(formData.get("email") ?? "")
     .trim()
@@ -28,6 +24,20 @@ export async function registrar(
   }
 
   const supabase = createServerClient();
+
+  // El registro sigue abierto mientras quede algún partido por jugarse.
+  const { data: lastMatch } = await supabase
+    .from("matches")
+    .select("kickoff")
+    .order("kickoff", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const registroAbierto = lastMatch
+    ? Date.now() < new Date(lastMatch.kickoff).getTime()
+    : !corteAlcanzado();
+  if (!registroAbierto) {
+    return { error: "El registro está cerrado: la fase de grupos ya terminó." };
+  }
 
   // Verificar si el correo ya está registrado.
   const { data: existente } = await supabase

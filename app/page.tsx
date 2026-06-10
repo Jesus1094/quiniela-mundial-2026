@@ -22,6 +22,19 @@ export default async function LandingPage() {
 
   const pagados = count ?? 0;
   const pozo = calcularPozo(pagados);
+
+  // El registro sigue abierto mientras quede algún partido por jugarse
+  // (la gente puede unirse durante la fase de grupos para pronosticar partidos).
+  const { data: lastMatch } = await supabase
+    .from("matches")
+    .select("kickoff")
+    .order("kickoff", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const registroAbierto = lastMatch
+    ? Date.now() < new Date(lastMatch.kickoff).getTime()
+    : !corteAlcanzado();
+  // 'cerrado' = ya pasó el corte de predicciones de torneo (campeón, grupos…).
   const cerrado = corteAlcanzado();
 
   return (
@@ -65,12 +78,12 @@ export default async function LandingPage() {
       </section>
 
       <section className="mt-10 flex w-full flex-col gap-3">
-        {!cerrado && (
+        {registroAbierto && (
           <Link
             href="/registro"
             className="rounded-xl bg-rojo px-6 py-4 font-sans text-lg font-bold text-white transition hover:bg-rojo/90"
           >
-            Registrarme y hacer mis predicciones
+            Registrarme y hacer mis pronósticos
           </Link>
         )}
         <Link
@@ -79,9 +92,16 @@ export default async function LandingPage() {
         >
           Ver tabla de posiciones
         </Link>
-        {cerrado && (
+        {registroAbierto && cerrado && (
           <p className="mt-2 font-sans text-sm text-navy/60">
-            El registro está cerrado. El torneo ya comenzó.
+            El corte de predicciones del torneo (campeón, grupos…) ya pasó, pero
+            aún puedes registrarte y pronosticar los partidos de la fase de
+            grupos.
+          </p>
+        )}
+        {!registroAbierto && (
+          <p className="mt-2 font-sans text-sm text-navy/60">
+            El registro está cerrado. La fase de grupos ya terminó.
           </p>
         )}
       </section>

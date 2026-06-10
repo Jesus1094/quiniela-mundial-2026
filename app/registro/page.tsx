@@ -1,11 +1,22 @@
 import Link from "next/link";
 import RegistroForm from "./RegistroForm";
 import { corteAlcanzado, GRUPO_NOMBRE } from "@/lib/constants";
+import { createServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default function RegistroPage() {
-  const cerrado = corteAlcanzado();
+export default async function RegistroPage() {
+  const supabase = createServerClient();
+  const { data: lastMatch } = await supabase
+    .from("matches")
+    .select("kickoff")
+    .order("kickoff", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const registroAbierto = lastMatch
+    ? Date.now() < new Date(lastMatch.kickoff).getTime()
+    : !corteAlcanzado();
+  const cerrado = !registroAbierto;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5 py-12">
@@ -30,7 +41,8 @@ export default function RegistroPage() {
             Registro cerrado
           </p>
           <p className="mt-2 font-sans text-sm text-navy/70">
-            El torneo ya comenzó. Puedes consultar la tabla de posiciones.
+            La fase de grupos ya terminó. Puedes consultar la tabla de
+            posiciones.
           </p>
           <Link
             href="/tabla"
