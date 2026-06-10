@@ -12,7 +12,7 @@ export default async function TablaPage() {
     supabase
       .from("participants")
       .select(
-        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, total)"
+        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, puntos_partidos, total)"
       ),
     supabase.from("results").select("id", { count: "exact", head: true }),
   ]);
@@ -26,6 +26,7 @@ export default async function TablaPage() {
       puntos_grupos: s?.puntos_grupos ?? 0,
       puntos_fases: s?.puntos_fases ?? 0,
       puntos_comodin: s?.puntos_comodin ?? 0,
+      puntos_partidos: s?.puntos_partidos ?? 0,
       total: s?.total ?? 0,
     };
   });

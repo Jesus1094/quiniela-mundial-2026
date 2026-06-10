@@ -84,6 +84,58 @@ export async function guardarResultado(
   return { ok: true };
 }
 
+export async function guardarPartido(input: {
+  matchId: string;
+  marcadorLocal: number | null;
+  marcadorVisitante: number | null;
+  kickoff?: string;
+}): Promise<{ ok?: boolean; error?: string }> {
+  if (!isAdmin()) return { error: "No autorizado." };
+
+  const { matchId, marcadorLocal, marcadorVisitante, kickoff } = input;
+
+  // El marcador debe venir completo (ambos) o vacío (ambos null, para limpiar).
+  const unoNull = marcadorLocal === null || marcadorVisitante === null;
+  const ambosNull = marcadorLocal === null && marcadorVisitante === null;
+  if (unoNull && !ambosNull) {
+    return { error: "Captura ambos marcadores o deja ambos vacíos." };
+  }
+  for (const n of [marcadorLocal, marcadorVisitante]) {
+    if (n !== null && (!Number.isInteger(n) || n < 0 || n > 99)) {
+      return { error: "Los marcadores deben ser enteros entre 0 y 99." };
+    }
+  }
+
+  const update: {
+    marcador_local: number | null;
+    marcador_visitante: number | null;
+    updated_at: string;
+    kickoff?: string;
+  } = {
+    marcador_local: marcadorLocal,
+    marcador_visitante: marcadorVisitante,
+    updated_at: new Date().toISOString(),
+  };
+  if (kickoff) {
+    const d = new Date(kickoff);
+    if (isNaN(d.getTime())) return { error: "Fecha/hora inválida." };
+    update.kickoff = d.toISOString();
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("matches")
+    .update(update)
+    .eq("id", matchId);
+
+  if (error) return { error: "No se pudo guardar el partido." };
+
+  // El trigger recalcula scores automáticamente al cambiar marcadores.
+  revalidatePath("/admin");
+  revalidatePath("/tabla");
+  return { ok: true };
+}
+
 export async function togglePago(
   participantId: string,
   valor: boolean

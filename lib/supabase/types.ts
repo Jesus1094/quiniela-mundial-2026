@@ -1,4 +1,4 @@
-// Tipos de la base de datos (manuales, alineados con la migración 001).
+// Tipos de la base de datos (manuales, alineados con migraciones 001 y 002).
 
 export type Database = {
   public: {
@@ -72,12 +72,80 @@ export type Database = {
         };
         Relationships: [];
       };
+      matches: {
+        Row: {
+          id: string;
+          grupo: string;
+          equipo_local: string;
+          equipo_visitante: string;
+          kickoff: string;
+          marcador_local: number | null;
+          marcador_visitante: number | null;
+          orden: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          grupo: string;
+          equipo_local: string;
+          equipo_visitante: string;
+          kickoff: string;
+          marcador_local?: number | null;
+          marcador_visitante?: number | null;
+          orden?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          grupo?: string;
+          equipo_local?: string;
+          equipo_visitante?: string;
+          kickoff?: string;
+          marcador_local?: number | null;
+          marcador_visitante?: number | null;
+          orden?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      match_predictions: {
+        Row: {
+          id: string;
+          participant_id: string;
+          match_id: string;
+          pred_local: number;
+          pred_visitante: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          participant_id: string;
+          match_id: string;
+          pred_local: number;
+          pred_visitante: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          participant_id?: string;
+          match_id?: string;
+          pred_local?: number;
+          pred_visitante?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       scores: {
         Row: {
           participant_id: string;
           puntos_grupos: number;
           puntos_fases: number;
           puntos_comodin: number;
+          puntos_partidos: number;
           total: number;
           updated_at: string;
         };
@@ -86,6 +154,7 @@ export type Database = {
           puntos_grupos?: number;
           puntos_fases?: number;
           puntos_comodin?: number;
+          puntos_partidos?: number;
           updated_at?: string;
         };
         Update: {
@@ -93,6 +162,7 @@ export type Database = {
           puntos_grupos?: number;
           puntos_fases?: number;
           puntos_comodin?: number;
+          puntos_partidos?: number;
           updated_at?: string;
         };
         Relationships: [];

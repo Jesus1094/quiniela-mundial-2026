@@ -5,11 +5,13 @@ import { useFormState, useFormStatus } from "react-dom";
 import {
   guardarResultado,
   togglePago,
+  guardarPartido,
   logout,
   type ResultadoState,
 } from "./actions";
 import { GRUPOS, TODOS_LOS_EQUIPOS, banderaDe } from "@/lib/teams";
 import { TIPOS_FASE, calcularPozo, repartirPremio, FMT_MXN } from "@/lib/constants";
+import { type Match, agruparPorDia, tieneResultado } from "@/lib/matches";
 
 // Tipos de resultado que el admin puede cargar: 12 grupos + 4 fases.
 const TIPOS_RESULTADO = [
@@ -41,13 +43,15 @@ export type AdminResult = { tipo: string; equipo_ganador: string };
 export default function AdminDashboard({
   participants,
   results,
+  matches,
 }: {
   participants: AdminParticipant[];
   results: AdminResult[];
+  matches: Match[];
 }) {
-  const [tab, setTab] = useState<"resultados" | "participantes" | "premio">(
-    "resultados"
-  );
+  const [tab, setTab] = useState<
+    "resultados" | "partidos" | "participantes" | "premio"
+  >("resultados");
 
   return (
     <main className="mx-auto max-w-4xl px-5 py-8">
@@ -65,6 +69,9 @@ export default function AdminDashboard({
         <TabBtn activo={tab === "resultados"} onClick={() => setTab("resultados")}>
           Resultados
         </TabBtn>
+        <TabBtn activo={tab === "partidos"} onClick={() => setTab("partidos")}>
+          Partidos
+        </TabBtn>
         <TabBtn
           activo={tab === "participantes"}
           onClick={() => setTab("participantes")}
@@ -77,6 +84,7 @@ export default function AdminDashboard({
       </div>
 
       {tab === "resultados" && <TabResultados results={results} />}
+      {tab === "partidos" && <TabPartidos matches={matches} />}
       {tab === "participantes" && <TabParticipantes participants={participants} />}
       {tab === "premio" && <TabPremio participants={participants} />}
     </main>
@@ -230,6 +238,127 @@ function TabResultados({ results }: { results: AdminResult[] }) {
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ── Tab: Partidos ────────────────────────────────────────────────────
+function isoToLocalInput(iso: string): string {
+  const d = new Date(iso);
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(
+    d.getHours()
+  )}:${p(d.getMinutes())}`;
+}
+
+function MatchRowAdmin({ m }: { m: Match }) {
+  const [local, setLocal] = useState(m.marcador_local?.toString() ?? "");
+  const [visit, setVisit] = useState(m.marcador_visitante?.toString() ?? "");
+  const [ko, setKo] = useState(isoToLocalInput(m.kickoff));
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const num = (s: string) => s.replace(/[^0-9]/g, "").slice(0, 2);
+
+  const save = () => {
+    setMsg(null);
+    const ml = local.trim() === "" ? null : Number(local);
+    const mv = visit.trim() === "" ? null : Number(visit);
+    start(async () => {
+      const res = await guardarPartido({
+        matchId: m.id,
+        marcadorLocal: ml,
+        marcadorVisitante: mv,
+        kickoff: new Date(ko).toISOString(),
+      });
+      setMsg(res.error ?? "✅");
+    });
+  };
+
+  return (
+    <div className="rounded-xl border-2 border-navy/10 bg-white p-3">
+      <div className="mb-2 flex items-center justify-between font-sans text-xs text-navy/50">
+        <span>Grupo {m.grupo}</span>
+        <span>{tieneResultado(m) ? "resultado cargado ✓" : ""}</span>
+      </div>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <span className="text-right font-sans text-sm font-semibold text-navy">
+          {banderaDe(m.equipo_local)} {m.equipo_local}
+        </span>
+        <div className="flex items-center gap-1">
+          <input
+            inputMode="numeric"
+            value={local}
+            onChange={(e) => setLocal(num(e.target.value))}
+            placeholder="–"
+            className="h-10 w-10 rounded-lg border-2 border-navy/15 bg-crema text-center font-serif text-lg font-bold text-navy outline-none focus:border-rojo"
+          />
+          <span className="font-bold text-navy/40">:</span>
+          <input
+            inputMode="numeric"
+            value={visit}
+            onChange={(e) => setVisit(num(e.target.value))}
+            placeholder="–"
+            className="h-10 w-10 rounded-lg border-2 border-navy/15 bg-crema text-center font-serif text-lg font-bold text-navy outline-none focus:border-rojo"
+          />
+        </div>
+        <span className="font-sans text-sm font-semibold text-navy">
+          {banderaDe(m.equipo_visitante)} {m.equipo_visitante}
+        </span>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <label className="font-sans text-xs text-navy/50">
+          Inicio (tu hora local):
+        </label>
+        <input
+          type="datetime-local"
+          value={ko}
+          onChange={(e) => setKo(e.target.value)}
+          className="rounded-lg border-2 border-navy/15 bg-crema px-2 py-1 font-sans text-xs text-navy outline-none focus:border-rojo"
+        />
+        <button
+          onClick={save}
+          disabled={pending}
+          className="ml-auto rounded-lg bg-rojo px-4 py-1.5 font-sans text-xs font-bold text-white hover:bg-rojo/90 disabled:opacity-50"
+        >
+          {pending ? "…" : "Guardar"}
+        </button>
+        {msg && (
+          <span className="font-sans text-xs font-semibold text-green-700">
+            {msg}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function TabPartidos({ matches }: { matches: Match[] }) {
+  const dias = agruparPorDia(matches);
+  const conResultado = matches.filter(tieneResultado).length;
+
+  return (
+    <div>
+      <p className="mb-4 font-sans text-sm text-navy/60">
+        Carga el marcador final de cada partido (ambos números). Al guardar, los
+        puntos por partido se recalculan automáticamente. También puedes ajustar
+        la fecha/hora de inicio de cada partido.{" "}
+        <strong>{conResultado}</strong> de {matches.length} con resultado.
+      </p>
+      <div className="flex flex-col gap-6">
+        {dias.map(({ dia, partidos }) => (
+          <section key={dia}>
+            <h3 className="mb-2 font-serif text-xl font-bold capitalize text-navy">
+              {dia}
+            </h3>
+            <div className="flex flex-col gap-2">
+              {partidos.map((m) => (
+                <MatchRowAdmin key={m.id} m={m} />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );

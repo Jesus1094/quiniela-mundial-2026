@@ -76,6 +76,12 @@ export default async function QuinielaPage({
             </span>
           )}
           <Link
+            href={`/quiniela/${participant.id}/partidos`}
+            className="rounded-full bg-navy px-4 py-1.5 font-sans text-sm font-semibold text-crema hover:bg-navy/90"
+          >
+            ⚽ Pronósticos por partido
+          </Link>
+          <Link
             href="/tabla"
             className="rounded-full border-2 border-navy/15 px-4 py-1.5 font-sans text-sm font-semibold text-navy hover:border-navy/40"
           >

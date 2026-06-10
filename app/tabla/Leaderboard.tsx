@@ -16,6 +16,7 @@ export type Fila = {
   puntos_grupos: number;
   puntos_fases: number;
   puntos_comodin: number;
+  puntos_partidos: number;
   total: number;
 };
 
@@ -42,7 +43,7 @@ export default function Leaderboard({
     const { data } = await supabase
       .from("participants")
       .select(
-        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, total)"
+        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, puntos_partidos, total)"
       );
     if (!data) return;
     const mapped: Fila[] = data.map((p: any) => {
@@ -54,6 +55,7 @@ export default function Leaderboard({
         puntos_grupos: s?.puntos_grupos ?? 0,
         puntos_fases: s?.puntos_fases ?? 0,
         puntos_comodin: s?.puntos_comodin ?? 0,
+        puntos_partidos: s?.puntos_partidos ?? 0,
         total: s?.total ?? 0,
       };
     });
@@ -162,6 +164,9 @@ export default function Leaderboard({
               <th className="hidden px-3 py-3 text-center font-sans text-xs font-bold uppercase tracking-wider sm:table-cell">
                 Comodín
               </th>
+              <th className="hidden px-3 py-3 text-center font-sans text-xs font-bold uppercase tracking-wider sm:table-cell">
+                Partidos
+              </th>
               <th className="px-3 py-3 text-center font-sans text-xs font-bold uppercase tracking-wider">
                 Total
               </th>
@@ -171,7 +176,7 @@ export default function Leaderboard({
             {visibles.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-3 py-8 text-center font-sans text-navy/50"
                 >
                   Aún no hay participantes que mostrar.
@@ -204,6 +209,9 @@ export default function Leaderboard({
                 </td>
                 <td className="hidden px-3 py-3 text-center font-sans tabular-nums text-navy sm:table-cell">
                   {f.puntos_comodin}
+                </td>
+                <td className="hidden px-3 py-3 text-center font-sans tabular-nums text-navy sm:table-cell">
+                  {f.puntos_partidos}
                 </td>
                 <td className="px-3 py-3 text-center font-serif text-xl font-bold text-rojo tabular-nums">
                   {f.total}
