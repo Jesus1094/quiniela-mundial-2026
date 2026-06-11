@@ -3,7 +3,7 @@
 Single Page App (Next.js 14 + Supabase) para una quiniela privada de la Copa Mundial 2026. Cada participante predice una sola vez antes de la fecha de corte; el administrador carga resultados y el sistema recalcula los puntajes en tiempo real.
 
 - **Stack:** Next.js 14 (App Router) · Supabase (Postgres + RLS + Realtime) · Tailwind CSS · date-fns
-- **Fecha de corte:** 11 de junio de 2026, 11:00 AM (America/Mexico_City)
+- **Fecha de corte (predicciones de torneo):** 11 de junio de 2026, 12:30 PM (America/Mexico_City)
 - **Puntaje máximo posible:** 99 pts
 
 ---

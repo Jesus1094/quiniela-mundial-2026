@@ -2,9 +2,9 @@
 
 export const TIMEZONE = "America/Mexico_City";
 
-// Fecha de corte: 11 de junio de 2026, 11:00 AM hora de Ciudad de México (UTC-6, sin horario de verano).
-// 11:00 CDT == 17:00 UTC.
-export const CUTOFF_ISO = "2026-06-11T17:00:00.000Z";
+// Fecha de corte: 11 de junio de 2026, 12:30 PM hora de Ciudad de México (UTC-6, sin horario de verano).
+// 12:30 CDMX == 18:30 UTC. Coincide con 30 min antes del primer partido (13:00 CDMX).
+export const CUTOFF_ISO = "2026-06-11T18:30:00.000Z";
 export const CUTOFF_DATE = new Date(CUTOFF_ISO);
 
 // Inicio y fin del torneo (referencia).

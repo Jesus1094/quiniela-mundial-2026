@@ -59,7 +59,7 @@ export default async function LandingPage() {
         <Countdown targetIso={CUTOFF_ISO} />
         {!cerrado && (
           <p className="mt-4 font-sans text-sm text-navy/60">
-            11 de junio de 2026, 11:00 AM (hora de Ciudad de México)
+            11 de junio de 2026, 12:30 PM (hora de Ciudad de México)
           </p>
         )}
       </section>
