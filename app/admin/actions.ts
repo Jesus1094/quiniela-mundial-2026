@@ -89,10 +89,12 @@ export async function guardarPartido(input: {
   marcadorLocal: number | null;
   marcadorVisitante: number | null;
   kickoff?: string;
+  cierreOverride?: string | null;
 }): Promise<{ ok?: boolean; error?: string }> {
   if (!isAdmin()) return { error: "No autorizado." };
 
-  const { matchId, marcadorLocal, marcadorVisitante, kickoff } = input;
+  const { matchId, marcadorLocal, marcadorVisitante, kickoff, cierreOverride } =
+    input;
 
   // El marcador debe venir completo (ambos) o vacío (ambos null, para limpiar).
   const unoNull = marcadorLocal === null || marcadorVisitante === null;
@@ -111,6 +113,7 @@ export async function guardarPartido(input: {
     marcador_visitante: number | null;
     updated_at: string;
     kickoff?: string;
+    cierre_override?: string | null;
   } = {
     marcador_local: marcadorLocal,
     marcador_visitante: marcadorVisitante,
@@ -120,6 +123,15 @@ export async function guardarPartido(input: {
     const d = new Date(kickoff);
     if (isNaN(d.getTime())) return { error: "Fecha/hora inválida." };
     update.kickoff = d.toISOString();
+  }
+  if (cierreOverride !== undefined) {
+    if (cierreOverride) {
+      const c = new Date(cierreOverride);
+      if (isNaN(c.getTime())) return { error: "Cierre personalizado inválido." };
+      update.cierre_override = c.toISOString();
+    } else {
+      update.cierre_override = null; // limpiar → vuelve a la regla de 30 min
+    }
   }
 
   const supabase = createAdminClient();

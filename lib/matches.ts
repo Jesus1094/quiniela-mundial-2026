@@ -9,6 +9,7 @@ export type Match = {
   kickoff: string; // ISO UTC
   marcador_local: number | null;
   marcador_visitante: number | null;
+  cierre_override: string | null; // si existe, reemplaza el cierre por defecto
   orden: number;
 };
 
@@ -25,14 +26,18 @@ export const PTS_RESULTADO = 2;
 // Cierre de pronóstico: 30 minutos antes del kickoff.
 export const MINUTOS_CIERRE_ANTES = 30;
 
-export function cierreDe(match: { kickoff: string }): Date {
+export function cierreDe(match: {
+  kickoff: string;
+  cierre_override?: string | null;
+}): Date {
+  if (match.cierre_override) return new Date(match.cierre_override);
   return new Date(
     new Date(match.kickoff).getTime() - MINUTOS_CIERRE_ANTES * 60_000
   );
 }
 
 export function partidoAbierto(
-  match: { kickoff: string },
+  match: { kickoff: string; cierre_override?: string | null },
   now: Date = new Date()
 ): boolean {
   return now.getTime() < cierreDe(match).getTime();

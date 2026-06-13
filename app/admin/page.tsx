@@ -33,7 +33,7 @@ export default async function AdminPage() {
       supabase
         .from("matches")
         .select(
-          "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, orden"
+          "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden"
         )
         .order("orden", { ascending: true }),
     ]);

@@ -84,6 +84,7 @@ export type Database = {
           kickoff: string;
           marcador_local: number | null;
           marcador_visitante: number | null;
+          cierre_override: string | null;
           orden: number;
           created_at: string;
           updated_at: string;
@@ -96,6 +97,7 @@ export type Database = {
           kickoff: string;
           marcador_local?: number | null;
           marcador_visitante?: number | null;
+          cierre_override?: string | null;
           orden?: number;
           created_at?: string;
           updated_at?: string;
@@ -108,6 +110,7 @@ export type Database = {
           kickoff?: string;
           marcador_local?: number | null;
           marcador_visitante?: number | null;
+          cierre_override?: string | null;
           orden?: number;
           updated_at?: string;
         };

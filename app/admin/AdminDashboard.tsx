@@ -256,6 +256,9 @@ function MatchRowAdmin({ m }: { m: Match }) {
   const [local, setLocal] = useState(m.marcador_local?.toString() ?? "");
   const [visit, setVisit] = useState(m.marcador_visitante?.toString() ?? "");
   const [ko, setKo] = useState(isoToLocalInput(m.kickoff));
+  const [co, setCo] = useState(
+    m.cierre_override ? isoToLocalInput(m.cierre_override) : ""
+  );
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -271,6 +274,7 @@ function MatchRowAdmin({ m }: { m: Match }) {
         marcadorLocal: ml,
         marcadorVisitante: mv,
         kickoff: new Date(ko).toISOString(),
+        cierreOverride: co, // vacío = usar la regla por defecto (30 min antes)
       });
       setMsg(res.error ?? "✅");
     });
@@ -307,9 +311,9 @@ function MatchRowAdmin({ m }: { m: Match }) {
           {banderaDe(m.equipo_visitante)} {m.equipo_visitante}
         </span>
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
         <label className="font-sans text-xs text-navy/50">
-          Inicio (tu hora local):
+          Inicio (hora local):
         </label>
         <input
           type="datetime-local"
@@ -317,6 +321,24 @@ function MatchRowAdmin({ m }: { m: Match }) {
           onChange={(e) => setKo(e.target.value)}
           className="rounded-lg border-2 border-navy/15 bg-crema px-2 py-1 font-sans text-xs text-navy outline-none focus:border-rojo"
         />
+        <label className="font-sans text-xs text-navy/50">
+          Cierre personalizado:
+        </label>
+        <input
+          type="datetime-local"
+          value={co}
+          onChange={(e) => setCo(e.target.value)}
+          className="rounded-lg border-2 border-navy/15 bg-crema px-2 py-1 font-sans text-xs text-navy outline-none focus:border-rojo"
+        />
+        {co && (
+          <button
+            type="button"
+            onClick={() => setCo("")}
+            className="font-sans text-xs text-rojo underline"
+          >
+            limpiar
+          </button>
+        )}
         <button
           onClick={save}
           disabled={pending}
@@ -330,6 +352,10 @@ function MatchRowAdmin({ m }: { m: Match }) {
           </span>
         )}
       </div>
+      <p className="mt-1 font-sans text-[11px] text-navy/40">
+        Si dejas el cierre personalizado vacío, aplica el cierre normal: 30 min
+        antes del inicio.
+      </p>
     </div>
   );
 }

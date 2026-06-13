@@ -48,7 +48,7 @@ export async function guardarPronosticos(
   const ids = Array.from(new Set(items.map((i) => i.matchId)));
   const { data: matches } = await supabase
     .from("matches")
-    .select("id, kickoff")
+    .select("id, kickoff, cierre_override")
     .in("id", ids);
 
   const porId = new Map((matches ?? []).map((m) => [m.id, m]));
