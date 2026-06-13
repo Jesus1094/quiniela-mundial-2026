@@ -11,7 +11,8 @@ export const CUTOFF_DATE = new Date(CUTOFF_ISO);
 export const TORNEO_INICIO = new Date("2026-06-11T17:00:00.000Z");
 export const TORNEO_FIN = new Date("2026-07-19T23:00:00.000Z");
 
-export const CUOTA = Number(process.env.NEXT_PUBLIC_CUOTA ?? "200");
+// Cuota por participante en MXN. Fijada en código (ignora NEXT_PUBLIC_CUOTA).
+export const CUOTA = 350;
 export const GRUPO_NOMBRE =
   process.env.NEXT_PUBLIC_GRUPO_NOMBRE ?? "La Quiniela";
 

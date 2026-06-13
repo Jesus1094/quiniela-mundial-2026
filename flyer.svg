@@ -30,7 +30,7 @@
 
 <rect x="50" y="396" width="180" height="66" rx="12" fill="#F5F0E8"/>
 <text class="san" x="140" y="421" text-anchor="middle" fill="#0C044D" font-size="13" opacity="0.7">Cuota</text>
-<text class="ser" x="140" y="448" text-anchor="middle" fill="#CA041A" font-size="24" font-weight="700">$200 MXN</text>
+<text class="ser" x="140" y="448" text-anchor="middle" fill="#CA041A" font-size="24" font-weight="700">$350 MXN</text>
 
 <rect x="250" y="396" width="180" height="66" rx="12" fill="#F5F0E8"/>
 <text class="san" x="340" y="421" text-anchor="middle" fill="#0C044D" font-size="13" opacity="0.7">Premios del pozo</text>
