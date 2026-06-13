@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { corteAlcanzado, TIPOS_FASE } from "@/lib/constants";
 import { GRUPOS, TODOS_LOS_EQUIPOS } from "@/lib/teams";
+import { getSession } from "@/lib/auth";
 
 export type GuardarState = { ok?: boolean; error?: string };
 
@@ -28,7 +29,12 @@ export async function guardarPredicciones(
   const participantId = String(formData.get("participantId") ?? "");
   if (!participantId) return { error: "Participante no válido." };
 
-  const supabase = createServerClient();
+  // Solo el dueño de la sesión puede guardar sus predicciones.
+  if (getSession() !== participantId) {
+    return { error: "Tu sesión expiró. Inicia sesión de nuevo." };
+  }
+
+  const supabase = createAdminClient();
 
   const { data: participant } = await supabase
     .from("participants")

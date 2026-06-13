@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import PartidosForm from "./PartidosForm";
 import { createServerClient } from "@/lib/supabase/server";
 import { GRUPO_NOMBRE } from "@/lib/constants";
+import { getSession } from "@/lib/auth";
 import type { Match } from "@/lib/matches";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +13,9 @@ export default async function PartidosPage({
 }: {
   params: { id: string };
 }) {
-  const esUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      params.id
-    );
-  if (!esUuid) redirect("/registro");
+  const sid = getSession();
+  if (!sid) redirect("/login");
+  if (sid !== params.id) redirect(`/quiniela/${sid}`);
 
   const supabase = createServerClient();
 
@@ -25,7 +24,7 @@ export default async function PartidosPage({
     .select("id, nombre, pago_confirmado")
     .eq("id", params.id)
     .maybeSingle();
-  if (!participant) redirect("/registro");
+  if (!participant) redirect("/login");
 
   const [{ data: matches }, { data: preds }, { data: score }] =
     await Promise.all([

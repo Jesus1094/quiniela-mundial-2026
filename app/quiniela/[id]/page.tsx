@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import PrediccionesForm from "./PrediccionesForm";
 import { createServerClient } from "@/lib/supabase/server";
 import { corteAlcanzado, GRUPO_NOMBRE } from "@/lib/constants";
+import { getSession } from "@/lib/auth";
+import { logout } from "@/app/login/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -11,14 +13,12 @@ export default async function QuinielaPage({
 }: {
   params: { id: string };
 }) {
-  const supabase = createServerClient();
+  // Requiere sesión y que sea la propia quiniela del usuario.
+  const sid = getSession();
+  if (!sid) redirect("/login");
+  if (sid !== params.id) redirect(`/quiniela/${sid}`);
 
-  // Validar UUID antes de consultar para no romper la query.
-  const esUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      params.id
-    );
-  if (!esUuid) redirect("/registro");
+  const supabase = createServerClient();
 
   const { data: participant } = await supabase
     .from("participants")
@@ -26,7 +26,7 @@ export default async function QuinielaPage({
     .eq("id", params.id)
     .maybeSingle();
 
-  if (!participant) redirect("/registro");
+  if (!participant) redirect("/login");
 
   const [{ data: preds }, { data: score }, { count: resultsCount }] =
     await Promise.all([
@@ -52,9 +52,16 @@ export default async function QuinielaPage({
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-10">
-      <Link href="/" className="font-sans text-sm text-navy/60 hover:text-rojo">
-        ← Inicio
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/" className="font-sans text-sm text-navy/60 hover:text-rojo">
+          ← Inicio
+        </Link>
+        <form action={logout}>
+          <button className="font-sans text-sm text-navy/60 hover:text-rojo">
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
 
       <header className="mt-4 mb-8">
         <p className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-rojo">

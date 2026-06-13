@@ -9,6 +9,7 @@ export type Database = {
           nombre: string;
           email: string;
           pago_confirmado: boolean;
+          password_hash: string | null;
           created_at: string;
         };
         Insert: {
@@ -16,6 +17,7 @@ export type Database = {
           nombre: string;
           email: string;
           pago_confirmado?: boolean;
+          password_hash?: string | null;
           created_at?: string;
         };
         Update: {
@@ -23,6 +25,7 @@ export type Database = {
           nombre?: string;
           email?: string;
           pago_confirmado?: boolean;
+          password_hash?: string | null;
           created_at?: string;
         };
         Relationships: [];

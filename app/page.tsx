@@ -87,6 +87,12 @@ export default async function LandingPage() {
           </Link>
         )}
         <Link
+          href="/login"
+          className="rounded-xl border-2 border-rojo px-6 py-4 font-sans text-lg font-bold text-rojo transition hover:bg-rojo hover:text-white"
+        >
+          Ya tengo cuenta — Iniciar sesión
+        </Link>
+        <Link
           href="/tabla"
           className="rounded-xl border-2 border-navy px-6 py-4 font-sans text-lg font-bold text-navy transition hover:bg-navy hover:text-crema"
         >

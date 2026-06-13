@@ -4,10 +4,9 @@ import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { registrar, type RegistroState } from "./actions";
-import { CUOTA, FMT_MXN } from "@/lib/constants";
+import { login, type LoginState } from "./actions";
 
-const initial: RegistroState = {};
+const initial: LoginState = {};
 
 function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -17,13 +16,13 @@ function SubmitBtn() {
       disabled={pending}
       className="w-full rounded-xl bg-rojo px-6 py-4 font-sans text-lg font-bold text-white transition hover:bg-rojo/90 disabled:opacity-50"
     >
-      {pending ? "Registrando…" : "Crear cuenta y continuar"}
+      {pending ? "Entrando…" : "Iniciar sesión"}
     </button>
   );
 }
 
-export default function RegistroForm() {
-  const [state, formAction] = useFormState(registrar, initial);
+export default function LoginForm() {
+  const [state, formAction] = useFormState(login, initial);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,20 +33,6 @@ export default function RegistroForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-left">
-        <span className="font-sans text-sm font-semibold text-navy">
-          Nombre completo
-        </span>
-        <input
-          name="nombre"
-          type="text"
-          required
-          autoComplete="name"
-          className="rounded-xl border-2 border-navy/15 bg-white px-4 py-3 font-sans text-navy outline-none focus:border-rojo"
-          placeholder="Juan Pérez"
-        />
-      </label>
-
       <label className="flex flex-col gap-1 text-left">
         <span className="font-sans text-sm font-semibold text-navy">
           Correo electrónico
@@ -70,14 +55,10 @@ export default function RegistroForm() {
           name="password"
           type="password"
           required
-          minLength={6}
-          autoComplete="new-password"
+          autoComplete="current-password"
           className="rounded-xl border-2 border-navy/15 bg-white px-4 py-3 font-sans text-navy outline-none focus:border-rojo"
-          placeholder="Mínimo 6 caracteres"
+          placeholder="Tu contraseña"
         />
-        <span className="font-sans text-xs text-navy/50">
-          La usarás para volver a entrar y editar tus pronósticos.
-        </span>
       </label>
 
       {state.error && (
@@ -85,31 +66,23 @@ export default function RegistroForm() {
           <p className="font-sans text-sm font-semibold text-rojo">
             {state.error}
           </p>
-          {state.yaExiste && (
+          {state.noExiste && (
             <Link
-              href="/login"
+              href="/registro"
               className="font-sans text-sm font-semibold text-navy underline"
             >
-              Iniciar sesión →
+              Crear una cuenta →
             </Link>
           )}
         </div>
       )}
 
-      <div className="rounded-xl bg-navy/5 px-4 py-3 text-left">
-        <p className="font-sans text-sm text-navy/70">
-          Cuota de participación:{" "}
-          <strong className="text-navy">{FMT_MXN.format(CUOTA)}</strong> — El
-          administrador confirmará tu pago.
-        </p>
-      </div>
-
       <SubmitBtn />
 
       <p className="text-center font-sans text-sm text-navy/60">
-        ¿Ya tienes cuenta?{" "}
-        <Link href="/login" className="font-semibold text-rojo underline">
-          Inicia sesión
+        ¿No tienes cuenta?{" "}
+        <Link href="/registro" className="font-semibold text-rojo underline">
+          Regístrate
         </Link>
       </p>
     </form>

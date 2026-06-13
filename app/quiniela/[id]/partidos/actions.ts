@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { partidoAbierto } from "@/lib/matches";
+import { getSession } from "@/lib/auth";
 
 export type GuardarPartidosState = {
   ok?: boolean;
@@ -20,6 +21,10 @@ export async function guardarPronosticos(
   const participantId = String(formData.get("participantId") ?? "");
   if (!participantId) return { error: "Participante no válido." };
 
+  if (getSession() !== participantId) {
+    return { error: "Tu sesión expiró. Inicia sesión de nuevo." };
+  }
+
   let items: Item[] = [];
   try {
     items = JSON.parse(String(formData.get("payload") ?? "[]"));
@@ -30,7 +35,7 @@ export async function guardarPronosticos(
     return { error: "No hay pronósticos para guardar." };
   }
 
-  const supabase = createServerClient();
+  const supabase = createAdminClient();
 
   const { data: participant } = await supabase
     .from("participants")
