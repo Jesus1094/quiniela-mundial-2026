@@ -43,6 +43,12 @@ export default async function TablaPage() {
         <h1 className="mt-1 font-serif text-4xl font-bold text-navy">
           Tabla de posiciones
         </h1>
+        <Link
+          href="/integridad"
+          className="mt-1 inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
+        >
+          🔎 Bitácora de resultados (transparencia)
+        </Link>
       </header>
 
       <Leaderboard

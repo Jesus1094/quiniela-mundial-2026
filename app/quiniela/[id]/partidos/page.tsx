@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import PartidosForm from "./PartidosForm";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient, createAdminClient } from "@/lib/supabase/server";
 import { GRUPO_NOMBRE } from "@/lib/constants";
 import { getSession } from "@/lib/auth";
 import type { Match } from "@/lib/matches";
@@ -26,6 +26,7 @@ export default async function PartidosPage({
     .maybeSingle();
   if (!participant) redirect("/login");
 
+  const admin = createAdminClient();
   const [{ data: matches }, { data: preds }, { data: score }] =
     await Promise.all([
       supabase
@@ -34,7 +35,9 @@ export default async function PartidosPage({
           "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden"
         )
         .order("orden", { ascending: true }),
-      supabase
+      // Mis propios pronósticos: vía service role (la lectura pública de
+      // match_predictions queda deshabilitada para que nadie copie).
+      admin
         .from("match_predictions")
         .select("match_id, pred_local, pred_visitante")
         .eq("participant_id", params.id),

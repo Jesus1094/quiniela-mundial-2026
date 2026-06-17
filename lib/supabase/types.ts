@@ -173,6 +173,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      result_audit: {
+        Row: {
+          id: string;
+          ambito: string;
+          referencia: string;
+          detalle: string;
+          changed_at: string;
+        };
+        Insert: {
+          id?: string;
+          ambito: string;
+          referencia: string;
+          detalle: string;
+          changed_at?: string;
+        };
+        Update: {
+          id?: string;
+          ambito?: string;
+          referencia?: string;
+          detalle?: string;
+          changed_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

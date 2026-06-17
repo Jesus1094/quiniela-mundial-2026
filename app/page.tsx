@@ -112,7 +112,13 @@ export default async function LandingPage() {
         )}
       </section>
 
-      <footer className="mt-auto pt-12">
+      <footer className="mt-auto flex flex-col items-center gap-2 pt-12">
+        <Link
+          href="/integridad"
+          className="font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
+        >
+          🔎 Bitácora de resultados (transparencia)
+        </Link>
         <Link
           href="/admin"
           className="font-sans text-xs text-navy/40 underline-offset-2 hover:underline"
