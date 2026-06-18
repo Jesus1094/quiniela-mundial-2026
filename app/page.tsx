@@ -98,6 +98,12 @@ export default async function LandingPage() {
         >
           Ver tabla de posiciones
         </Link>
+        <Link
+          href="/grupos"
+          className="rounded-xl border-2 border-navy/20 px-6 py-3 font-sans font-semibold text-navy transition hover:border-navy"
+        >
+          📊 Simulador de grupos
+        </Link>
         {registroAbierto && cerrado && (
           <p className="mt-2 font-sans text-sm text-navy/60">
             El corte de predicciones del torneo (campeón, grupos…) ya pasó, pero

@@ -43,12 +43,20 @@ export default async function TablaPage() {
         <h1 className="mt-1 font-serif text-4xl font-bold text-navy">
           Tabla de posiciones
         </h1>
-        <Link
-          href="/integridad"
-          className="mt-1 inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
-        >
-          🔎 Bitácora de resultados (transparencia)
-        </Link>
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+          <Link
+            href="/grupos"
+            className="inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
+          >
+            📊 Simulador de grupos
+          </Link>
+          <Link
+            href="/integridad"
+            className="inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
+          >
+            🔎 Bitácora de resultados
+          </Link>
+        </div>
       </header>
 
       <Leaderboard

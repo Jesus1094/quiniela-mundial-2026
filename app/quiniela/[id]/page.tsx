@@ -95,6 +95,12 @@ export default async function QuinielaPage({
             👁️ Pronósticos del grupo
           </Link>
           <Link
+            href="/grupos"
+            className="rounded-full border-2 border-navy/15 px-4 py-1.5 font-sans text-sm font-semibold text-navy hover:border-navy/40"
+          >
+            📊 Simulador de grupos
+          </Link>
+          <Link
             href="/tabla"
             className="rounded-full border-2 border-navy/15 px-4 py-1.5 font-sans text-sm font-semibold text-navy hover:border-navy/40"
           >
