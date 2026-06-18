@@ -81,6 +81,12 @@ export default async function GruposPage() {
             (mejor tercero)
           </span>
         </div>
+        <Link
+          href="/que-pasa-si"
+          className="mt-4 inline-block rounded-xl bg-rojo px-5 py-2.5 font-sans text-sm font-bold text-white transition hover:bg-rojo/90"
+        >
+          🔮 Probar escenarios: ¿qué pasa si…?
+        </Link>
       </header>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
