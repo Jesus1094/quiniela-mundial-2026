@@ -4,6 +4,14 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/server";
 import { GRUPOS, TODOS_LOS_EQUIPOS } from "@/lib/teams";
+import { calcularPosiciones, rankearTerceros } from "@/lib/standings";
+import {
+  asignarTerceros,
+  resolverCuadro,
+  type KoState,
+  type Tercero,
+} from "@/lib/knockout";
+import type { Match } from "@/lib/matches";
 
 const COOKIE = "admin_auth";
 
@@ -165,5 +173,128 @@ export async function togglePago(
   revalidatePath("/admin");
   revalidatePath("/tabla");
   revalidatePath("/");
+  return { ok: true };
+}
+
+const MSEL_KO =
+  "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden";
+
+// Recalcula la llave y escribe campeón/subcampeón/3º/4º en results (alimenta
+// el puntaje de la quiniela) cuando la final y el 3er lugar están definidos.
+async function recomputarPodio(admin: ReturnType<typeof createAdminClient>) {
+  const [{ data: matches }, { data: koRows }, { data: thirds }] =
+    await Promise.all([
+      admin.from("matches").select(MSEL_KO).order("orden", { ascending: true }),
+      admin
+        .from("knockout_matches")
+        .select("num, marcador_local, marcador_visitante, ganador"),
+      admin.from("knockout_thirds_override").select("match_num, equipo"),
+    ]);
+
+  const ms = (matches ?? []) as Match[];
+  const posPorGrupo = new Map(
+    GRUPOS.map((g) => [
+      g.letra,
+      calcularPosiciones(
+        g.equipos.map((e) => e.nombre),
+        ms.filter((m) => m.grupo === g.letra)
+      ),
+    ])
+  );
+  const terc8: Tercero[] = rankearTerceros(
+    GRUPOS.map((g) => {
+      const p = posPorGrupo.get(g.letra)!.find((x) => x.pos === 3)!;
+      return { ...p, grupo: g.letra };
+    })
+  )
+    .slice(0, 8)
+    .map((t) => ({ grupo: t.grupo, team: t.team }));
+  const overrides = new Map(
+    (thirds ?? []).map((t: any) => [t.match_num as number, t.equipo as string])
+  );
+  const { mapa } = asignarTerceros(terc8, overrides);
+  const koMap = new Map<number, KoState>(
+    (koRows ?? []).map((k: any) => [k.num as number, k as KoState])
+  );
+  const resolved = resolverCuadro(posPorGrupo, koMap, mapa);
+
+  const ups: { tipo: string; equipo_ganador: string }[] = [];
+  const fin = resolved.get(104);
+  if (fin?.ganador && fin.home && fin.away) {
+    ups.push({ tipo: "campeon", equipo_ganador: fin.ganador });
+    ups.push({
+      tipo: "subcampeon",
+      equipo_ganador: fin.ganador === fin.home ? fin.away : fin.home,
+    });
+  }
+  const ter = resolved.get(103);
+  if (ter?.ganador && ter.home && ter.away) {
+    ups.push({ tipo: "tercero", equipo_ganador: ter.ganador });
+    ups.push({
+      tipo: "cuarto",
+      equipo_ganador: ter.ganador === ter.home ? ter.away : ter.home,
+    });
+  }
+  for (const u of ups) {
+    await admin
+      .from("results")
+      .upsert(
+        { tipo: u.tipo, equipo_ganador: u.equipo_ganador, updated_at: new Date().toISOString() },
+        { onConflict: "tipo" }
+      );
+  }
+}
+
+export async function guardarKnockout(input: {
+  num: number;
+  marcadorLocal: number | null;
+  marcadorVisitante: number | null;
+  ganador: string | null;
+}): Promise<{ ok?: boolean; error?: string }> {
+  if (!isAdmin()) return { error: "No autorizado." };
+  const { num, marcadorLocal, marcadorVisitante, ganador } = input;
+  for (const n of [marcadorLocal, marcadorVisitante]) {
+    if (n !== null && (!Number.isInteger(n) || n < 0 || n > 99)) {
+      return { error: "Los marcadores deben ser enteros entre 0 y 99." };
+    }
+  }
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("knockout_matches")
+    .update({
+      marcador_local: marcadorLocal,
+      marcador_visitante: marcadorVisitante,
+      ganador: ganador || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("num", num);
+  if (error) return { error: "No se pudo guardar el partido." };
+  await recomputarPodio(admin);
+  revalidatePath("/llave");
+  revalidatePath("/tabla");
+  revalidatePath("/admin");
+  return { ok: true };
+}
+
+export async function guardarTercero(
+  matchNum: number,
+  equipo: string | null
+): Promise<{ ok?: boolean; error?: string }> {
+  if (!isAdmin()) return { error: "No autorizado." };
+  const admin = createAdminClient();
+  if (equipo) {
+    const { error } = await admin
+      .from("knockout_thirds_override")
+      .upsert({ match_num: matchNum, equipo }, { onConflict: "match_num" });
+    if (error) return { error: "No se pudo guardar el tercero." };
+  } else {
+    await admin
+      .from("knockout_thirds_override")
+      .delete()
+      .eq("match_num", matchNum);
+  }
+  await recomputarPodio(admin);
+  revalidatePath("/llave");
+  revalidatePath("/admin");
   return { ok: true };
 }

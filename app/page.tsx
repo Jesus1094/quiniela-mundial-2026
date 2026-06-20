@@ -98,12 +98,20 @@ export default async function LandingPage() {
         >
           Ver tabla de posiciones
         </Link>
-        <Link
-          href="/grupos"
-          className="rounded-xl border-2 border-navy/20 px-6 py-3 font-sans font-semibold text-navy transition hover:border-navy"
-        >
-          📊 Simulador de grupos
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/grupos"
+            className="flex-1 rounded-xl border-2 border-navy/20 px-4 py-3 text-center font-sans font-semibold text-navy transition hover:border-navy"
+          >
+            📊 Grupos
+          </Link>
+          <Link
+            href="/llave"
+            className="flex-1 rounded-xl border-2 border-navy/20 px-4 py-3 text-center font-sans font-semibold text-navy transition hover:border-navy"
+          >
+            🏆 Llave final
+          </Link>
+        </div>
         {registroAbierto && cerrado && (
           <p className="mt-2 font-sans text-sm text-navy/60">
             El corte de predicciones del torneo (campeón, grupos…) ya pasó, pero

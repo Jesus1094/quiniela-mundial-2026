@@ -6,12 +6,34 @@ import {
   guardarResultado,
   togglePago,
   guardarPartido,
+  guardarKnockout,
+  guardarTercero,
   logout,
   type ResultadoState,
 } from "./actions";
 import { GRUPOS, TODOS_LOS_EQUIPOS, banderaDe } from "@/lib/teams";
 import { TIPOS_FASE, calcularPozo, repartirPremio, FMT_MXN } from "@/lib/constants";
 import { type Match, agruparPorDia, tieneResultado } from "@/lib/matches";
+import { calcularPosiciones, rankearTerceros } from "@/lib/standings";
+import {
+  BRACKET,
+  RONDA_LABEL,
+  THIRD_ELIGIBLE,
+  THIRD_SLOTS,
+  asignarTerceros,
+  resolverCuadro,
+  type KoState,
+  type Ronda,
+  type Tercero,
+} from "@/lib/knockout";
+
+type KoRow = {
+  num: number;
+  marcador_local: number | null;
+  marcador_visitante: number | null;
+  ganador: string | null;
+};
+type ThirdOv = { match_num: number; equipo: string };
 
 // Tipos de resultado que el admin puede cargar: 12 grupos + 4 fases.
 const TIPOS_RESULTADO = [
@@ -44,13 +66,17 @@ export default function AdminDashboard({
   participants,
   results,
   matches,
+  ko,
+  thirds,
 }: {
   participants: AdminParticipant[];
   results: AdminResult[];
   matches: Match[];
+  ko: KoRow[];
+  thirds: ThirdOv[];
 }) {
   const [tab, setTab] = useState<
-    "resultados" | "partidos" | "participantes" | "premio"
+    "resultados" | "partidos" | "llave" | "participantes" | "premio"
   >("resultados");
 
   return (
@@ -72,6 +98,9 @@ export default function AdminDashboard({
         <TabBtn activo={tab === "partidos"} onClick={() => setTab("partidos")}>
           Partidos
         </TabBtn>
+        <TabBtn activo={tab === "llave"} onClick={() => setTab("llave")}>
+          Llave
+        </TabBtn>
         <TabBtn
           activo={tab === "participantes"}
           onClick={() => setTab("participantes")}
@@ -85,6 +114,7 @@ export default function AdminDashboard({
 
       {tab === "resultados" && <TabResultados results={results} />}
       {tab === "partidos" && <TabPartidos matches={matches} />}
+      {tab === "llave" && <TabLlave matches={matches} ko={ko} thirds={thirds} />}
       {tab === "participantes" && <TabParticipantes participants={participants} />}
       {tab === "premio" && <TabPremio participants={participants} />}
     </main>
@@ -382,6 +412,226 @@ function TabPartidos({ matches }: { matches: Match[] }) {
               {partidos.map((m) => (
                 <MatchRowAdmin key={m.id} m={m} />
               ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Tab: Llave (eliminatorias) ───────────────────────────────────────
+function KoRowAdmin({
+  num,
+  ronda,
+  home,
+  away,
+  homeLabel,
+  awayLabel,
+  ml,
+  mv,
+  ganadorActual,
+}: {
+  num: number;
+  ronda: Ronda;
+  home: string | null;
+  away: string | null;
+  homeLabel: string;
+  awayLabel: string;
+  ml: number | null;
+  mv: number | null;
+  ganadorActual: string | null;
+}) {
+  const [l, setL] = useState(ml?.toString() ?? "");
+  const [v, setV] = useState(mv?.toString() ?? "");
+  const [gan, setGan] = useState(ganadorActual ?? "");
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+  const num2 = (s: string) => s.replace(/[^0-9]/g, "").slice(0, 2);
+
+  const save = () => {
+    setMsg(null);
+    start(async () => {
+      const res = await guardarKnockout({
+        num,
+        marcadorLocal: l.trim() === "" ? null : Number(l),
+        marcadorVisitante: v.trim() === "" ? null : Number(v),
+        ganador: gan || null,
+      });
+      setMsg(res.error ?? "✅");
+    });
+  };
+
+  return (
+    <div className="rounded-xl border-2 border-navy/10 bg-white p-2">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 text-xs">
+        <span className="truncate text-right font-sans font-semibold text-navy">
+          {home ? `${banderaDe(home)} ${home}` : <span className="italic text-navy/40">{homeLabel}</span>}
+        </span>
+        <span className="flex items-center gap-0.5">
+          <input
+            inputMode="numeric"
+            value={l}
+            onChange={(e) => setL(num2(e.target.value))}
+            className="h-7 w-7 rounded border-2 border-navy/15 bg-crema text-center font-serif text-sm font-bold text-navy outline-none focus:border-rojo"
+          />
+          <span className="text-navy/40">:</span>
+          <input
+            inputMode="numeric"
+            value={v}
+            onChange={(e) => setV(num2(e.target.value))}
+            className="h-7 w-7 rounded border-2 border-navy/15 bg-crema text-center font-serif text-sm font-bold text-navy outline-none focus:border-rojo"
+          />
+        </span>
+        <span className="truncate font-sans font-semibold text-navy">
+          {away ? `${banderaDe(away)} ${away}` : <span className="italic text-navy/40">{awayLabel}</span>}
+        </span>
+      </div>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <span className="font-sans text-[11px] text-navy/50">#{num} · avanza:</span>
+        <select
+          value={gan}
+          onChange={(e) => setGan(e.target.value)}
+          className="rounded border-2 border-navy/15 bg-crema px-1 py-0.5 font-sans text-xs text-navy outline-none focus:border-rojo"
+        >
+          <option value="">(auto por marcador)</option>
+          {home && <option value={home}>{home}</option>}
+          {away && <option value={away}>{away}</option>}
+        </select>
+        <button
+          onClick={save}
+          disabled={pending}
+          className="ml-auto rounded bg-rojo px-3 py-1 font-sans text-xs font-bold text-white hover:bg-rojo/90 disabled:opacity-50"
+        >
+          {pending ? "…" : "Guardar"}
+        </button>
+        {msg && <span className="font-sans text-xs font-semibold text-green-700">{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
+function TercSelect({
+  slot,
+  opciones,
+  actual,
+}: {
+  slot: number;
+  opciones: Tercero[];
+  actual: string;
+}) {
+  const [val, setVal] = useState(actual);
+  const [pending, start] = useTransition();
+  const cambiar = (equipo: string) => {
+    setVal(equipo);
+    start(async () => {
+      await guardarTercero(slot, equipo || null);
+    });
+  };
+  return (
+    <div className="flex items-center justify-between gap-2 rounded-lg border-2 border-navy/10 bg-white px-3 py-1.5">
+      <span className="font-sans text-xs text-navy/70">
+        Llave #{slot} — 3º de {THIRD_ELIGIBLE[slot].join("/")}
+      </span>
+      <select
+        value={val}
+        onChange={(e) => cambiar(e.target.value)}
+        disabled={pending}
+        className="rounded border-2 border-navy/15 bg-crema px-1 py-0.5 font-sans text-xs text-navy outline-none focus:border-rojo"
+      >
+        <option value="">(automático)</option>
+        {opciones.map((o) => (
+          <option key={o.team} value={o.team}>
+            {o.team} (Gpo {o.grupo})
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function TabLlave({
+  matches,
+  ko,
+  thirds,
+}: {
+  matches: Match[];
+  ko: KoRow[];
+  thirds: ThirdOv[];
+}) {
+  const posPorGrupo = new Map(
+    GRUPOS.map((g) => [
+      g.letra,
+      calcularPosiciones(
+        g.equipos.map((e) => e.nombre),
+        matches.filter((m) => m.grupo === g.letra)
+      ),
+    ])
+  );
+  const terc8: Tercero[] = rankearTerceros(
+    GRUPOS.map((g) => {
+      const p = posPorGrupo.get(g.letra)!.find((x) => x.pos === 3)!;
+      return { ...p, grupo: g.letra };
+    })
+  )
+    .slice(0, 8)
+    .map((t) => ({ grupo: t.grupo, team: t.team }));
+  const overrides = new Map(thirds.map((t) => [t.match_num, t.equipo]));
+  const { mapa } = asignarTerceros(terc8, overrides);
+  const koMap = new Map<number, KoState>(ko.map((k) => [k.num, k]));
+  const resolved = resolverCuadro(posPorGrupo, koMap, mapa);
+
+  const ordenRondas: Ronda[] = ["r32", "r16", "qf", "sf", "tercer", "final"];
+
+  return (
+    <div>
+      <p className="mb-4 font-sans text-sm text-navy/60">
+        Captura el marcador y quién avanza en cada partido (el podio campeón /
+        subcampeón / 3º / 4º se escribe solo y puntúa la quiniela). Los terceros
+        se asignan automáticamente; puedes forzarlos abajo si difieren del cuadro
+        oficial.
+      </p>
+
+      <details className="mb-5 rounded-xl border-2 border-navy/10 bg-navy/[0.03] p-3">
+        <summary className="cursor-pointer font-sans text-sm font-semibold text-navy">
+          Asignación de terceros (override)
+        </summary>
+        <div className="mt-2 flex flex-col gap-1.5">
+          {THIRD_SLOTS.map((slot) => (
+            <TercSelect
+              key={slot}
+              slot={slot}
+              opciones={terc8.filter((t) => THIRD_ELIGIBLE[slot].includes(t.grupo))}
+              actual={overrides.get(slot) ?? ""}
+            />
+          ))}
+        </div>
+      </details>
+
+      <div className="flex flex-col gap-5">
+        {ordenRondas.map((ronda) => (
+          <section key={ronda}>
+            <h3 className="mb-2 font-serif text-xl font-bold text-navy">
+              {RONDA_LABEL[ronda]}
+            </h3>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {BRACKET.filter((b) => b.ronda === ronda).map((b) => {
+                const r = resolved.get(b.num)!;
+                return (
+                  <KoRowAdmin
+                    key={b.num}
+                    num={b.num}
+                    ronda={ronda}
+                    home={r.home}
+                    away={r.away}
+                    homeLabel={r.homeLabel}
+                    awayLabel={r.awayLabel}
+                    ml={r.marcador_local}
+                    mv={r.marcador_visitante}
+                    ganadorActual={r.ganador}
+                  />
+                );
+              })}
             </div>
           </section>
         ))}

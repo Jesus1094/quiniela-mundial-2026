@@ -197,6 +197,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      knockout_matches: {
+        Row: {
+          num: number;
+          ronda: string;
+          marcador_local: number | null;
+          marcador_visitante: number | null;
+          ganador: string | null;
+          kickoff: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          num: number;
+          ronda: string;
+          marcador_local?: number | null;
+          marcador_visitante?: number | null;
+          ganador?: string | null;
+          kickoff?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          num?: number;
+          ronda?: string;
+          marcador_local?: number | null;
+          marcador_visitante?: number | null;
+          ganador?: string | null;
+          kickoff?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      knockout_thirds_override: {
+        Row: { match_num: number; equipo: string };
+        Insert: { match_num: number; equipo: string };
+        Update: { match_num?: number; equipo?: string };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

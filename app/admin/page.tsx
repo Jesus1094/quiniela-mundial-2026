@@ -21,22 +21,31 @@ export default async function AdminPage() {
 
   const supabase = createAdminClient();
 
-  const [{ data: parts }, { data: results }, { data: matches }] =
-    await Promise.all([
-      supabase
-        .from("participants")
-        .select(
-          "id, nombre, email, pago_confirmado, scores(total), predictions(count)"
-        )
-        .order("created_at", { ascending: true }),
-      supabase.from("results").select("tipo, equipo_ganador"),
-      supabase
-        .from("matches")
-        .select(
-          "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden"
-        )
-        .order("orden", { ascending: true }),
-    ]);
+  const [
+    { data: parts },
+    { data: results },
+    { data: matches },
+    { data: ko },
+    { data: thirds },
+  ] = await Promise.all([
+    supabase
+      .from("participants")
+      .select(
+        "id, nombre, email, pago_confirmado, scores(total), predictions(count)"
+      )
+      .order("created_at", { ascending: true }),
+    supabase.from("results").select("tipo, equipo_ganador"),
+    supabase
+      .from("matches")
+      .select(
+        "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden"
+      )
+      .order("orden", { ascending: true }),
+    supabase
+      .from("knockout_matches")
+      .select("num, marcador_local, marcador_visitante, ganador"),
+    supabase.from("knockout_thirds_override").select("match_num, equipo"),
+  ]);
 
   const participants: AdminParticipant[] = (parts ?? []).map((p: any) => {
     const score = Array.isArray(p.scores) ? p.scores[0] : p.scores;
@@ -58,6 +67,8 @@ export default async function AdminPage() {
       participants={participants}
       results={(results ?? []) as AdminResult[]}
       matches={(matches ?? []) as Match[]}
+      ko={(ko ?? []) as any}
+      thirds={(thirds ?? []) as any}
     />
   );
 }

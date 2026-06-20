@@ -51,6 +51,12 @@ export default async function TablaPage() {
             📊 Simulador de grupos
           </Link>
           <Link
+            href="/llave"
+            className="inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
+          >
+            🏆 Llave final
+          </Link>
+          <Link
             href="/integridad"
             className="inline-block font-sans text-sm font-semibold text-navy/70 underline-offset-2 hover:text-rojo hover:underline"
           >
