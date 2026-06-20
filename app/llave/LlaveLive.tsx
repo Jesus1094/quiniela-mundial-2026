@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { GRUPOS, banderaDe } from "@/lib/teams";
+import { TIMEZONE } from "@/lib/constants";
 import type { Match } from "@/lib/matches";
 import { calcularPosiciones, rankearTerceros } from "@/lib/standings";
 import {
   BRACKET,
   RONDA_LABEL,
+  KO_SCHEDULE,
   asignarTerceros,
   resolverCuadro,
   type KoState,
@@ -15,6 +17,16 @@ import {
   type Ronda,
   type Tercero,
 } from "@/lib/knockout";
+
+const fmtFecha = new Intl.DateTimeFormat("es-MX", {
+  timeZone: TIMEZONE,
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
 
 const MSEL =
   "id, grupo, equipo_local, equipo_visitante, kickoff, marcador_local, marcador_visitante, cierre_override, orden";
@@ -167,10 +179,14 @@ function Lado({
 }
 
 function GameCard({ g }: { g: ResolvedGame }) {
+  const sch = KO_SCHEDULE[g.num];
   return (
     <div className="overflow-hidden rounded-xl border-2 border-navy/10 bg-white">
-      <div className="flex items-center justify-between bg-navy/5 px-3 py-0.5">
-        <span className="font-sans text-[10px] font-semibold uppercase tracking-wide text-navy/40">
+      <div className="flex items-center justify-between gap-2 bg-navy/5 px-3 py-1">
+        <span className="truncate font-sans text-[10px] text-navy/50">
+          {sch ? `${fmtFecha.format(new Date(sch.kickoff))} h · ${sch.sede}` : ""}
+        </span>
+        <span className="shrink-0 font-sans text-[10px] font-semibold uppercase tracking-wide text-navy/40">
           #{g.num}
         </span>
       </div>

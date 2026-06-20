@@ -76,6 +76,43 @@ export const BRACKET: BracketGame[] = [
   { num: 104, ronda: "final", home: { t: "win", m: 101 }, away: { t: "win", m: 102 } },
 ];
 
+// Calendario oficial de eliminatorias (num -> kickoff UTC + sede).
+// Horas originales en ET (EDT = UTC-4); aquí ya convertidas a UTC.
+export const KO_SCHEDULE: Record<number, { kickoff: string; sede: string }> = {
+  73: { kickoff: "2026-06-28T19:00:00Z", sede: "Inglewood (SoFi)" },
+  74: { kickoff: "2026-06-29T20:30:00Z", sede: "Foxborough (Gillette)" },
+  75: { kickoff: "2026-06-30T00:00:00Z", sede: "Guadalupe (BBVA)" },
+  76: { kickoff: "2026-06-29T17:00:00Z", sede: "Houston (NRG)" },
+  77: { kickoff: "2026-06-30T21:00:00Z", sede: "East Rutherford (MetLife)" },
+  78: { kickoff: "2026-06-30T17:00:00Z", sede: "Arlington (AT&T)" },
+  79: { kickoff: "2026-07-01T00:00:00Z", sede: "Ciudad de México (Azteca)" },
+  80: { kickoff: "2026-07-01T17:00:00Z", sede: "Atlanta (Mercedes-Benz)" },
+  81: { kickoff: "2026-07-01T23:00:00Z", sede: "Santa Clara (Levi's)" },
+  82: { kickoff: "2026-07-01T20:00:00Z", sede: "Seattle (Lumen)" },
+  83: { kickoff: "2026-07-02T23:00:00Z", sede: "Toronto (BMO)" },
+  84: { kickoff: "2026-07-02T19:00:00Z", sede: "Inglewood (SoFi)" },
+  85: { kickoff: "2026-07-03T03:00:00Z", sede: "Vancouver (BC Place)" },
+  86: { kickoff: "2026-07-03T22:00:00Z", sede: "Miami Gardens (Hard Rock)" },
+  87: { kickoff: "2026-07-04T01:30:00Z", sede: "Kansas City (Arrowhead)" },
+  88: { kickoff: "2026-07-03T18:00:00Z", sede: "Arlington (AT&T)" },
+  89: { kickoff: "2026-07-04T21:00:00Z", sede: "Philadelphia (Lincoln Financial)" },
+  90: { kickoff: "2026-07-04T16:00:00Z", sede: "Houston (NRG)" },
+  91: { kickoff: "2026-07-05T20:00:00Z", sede: "East Rutherford (MetLife)" },
+  92: { kickoff: "2026-07-05T23:00:00Z", sede: "Ciudad de México (Azteca)" },
+  93: { kickoff: "2026-07-06T18:00:00Z", sede: "Arlington (AT&T)" },
+  94: { kickoff: "2026-07-07T00:00:00Z", sede: "Seattle (Lumen)" },
+  95: { kickoff: "2026-07-07T16:00:00Z", sede: "Atlanta (Mercedes-Benz)" },
+  96: { kickoff: "2026-07-07T20:00:00Z", sede: "Vancouver (BC Place)" },
+  97: { kickoff: "2026-07-09T20:00:00Z", sede: "Foxborough (Gillette)" },
+  98: { kickoff: "2026-07-10T19:00:00Z", sede: "Inglewood (SoFi)" },
+  99: { kickoff: "2026-07-11T21:00:00Z", sede: "Miami Gardens (Hard Rock)" },
+  100: { kickoff: "2026-07-12T01:00:00Z", sede: "Kansas City (Arrowhead)" },
+  101: { kickoff: "2026-07-14T18:00:00Z", sede: "Arlington (AT&T)" },
+  102: { kickoff: "2026-07-15T19:00:00Z", sede: "Atlanta (Mercedes-Benz)" },
+  103: { kickoff: "2026-07-18T21:00:00Z", sede: "Miami Gardens (Hard Rock)" },
+  104: { kickoff: "2026-07-19T19:00:00Z", sede: "East Rutherford (MetLife)" },
+};
+
 export type Tercero = { grupo: string; team: string };
 
 // Asigna los 8 mejores terceros a las 8 llaves por emparejamiento válido

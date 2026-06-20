@@ -20,12 +20,22 @@ import {
   RONDA_LABEL,
   THIRD_ELIGIBLE,
   THIRD_SLOTS,
+  KO_SCHEDULE,
   asignarTerceros,
   resolverCuadro,
   type KoState,
   type Ronda,
   type Tercero,
 } from "@/lib/knockout";
+
+const fmtKoFecha = new Intl.DateTimeFormat("es-MX", {
+  timeZone: "America/Mexico_City",
+  day: "numeric",
+  month: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
 
 type KoRow = {
   num: number;
@@ -488,7 +498,13 @@ function KoRowAdmin({
         </span>
       </div>
       <div className="mt-1 flex flex-wrap items-center gap-2">
-        <span className="font-sans text-[11px] text-navy/50">#{num} · avanza:</span>
+        <span className="font-sans text-[11px] text-navy/50">
+          #{num}
+          {KO_SCHEDULE[num]
+            ? ` · ${fmtKoFecha.format(new Date(KO_SCHEDULE[num].kickoff))}h · ${KO_SCHEDULE[num].sede}`
+            : ""}{" "}
+          · avanza:
+        </span>
         <select
           value={gan}
           onChange={(e) => setGan(e.target.value)}
