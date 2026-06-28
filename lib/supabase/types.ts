@@ -233,6 +233,35 @@ export type Database = {
         Update: { match_num?: number; equipo?: string };
         Relationships: [];
       };
+      knockout_predictions: {
+        Row: {
+          id: string;
+          participant_id: string;
+          match_num: number;
+          pred_local: number;
+          pred_visitante: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          participant_id: string;
+          match_num: number;
+          pred_local: number;
+          pred_visitante: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          participant_id?: string;
+          match_num?: number;
+          pred_local?: number;
+          pred_visitante?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

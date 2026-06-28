@@ -86,7 +86,13 @@ export default async function QuinielaPage({
             href={`/quiniela/${participant.id}/partidos`}
             className="rounded-full bg-navy px-4 py-1.5 font-sans text-sm font-semibold text-crema hover:bg-navy/90"
           >
-            ⚽ Pronósticos por partido
+            ⚽ Marcadores (grupos)
+          </Link>
+          <Link
+            href={`/quiniela/${participant.id}/eliminatorias`}
+            className="rounded-full bg-navy px-4 py-1.5 font-sans text-sm font-semibold text-crema hover:bg-navy/90"
+          >
+            🏆 Marcadores (fase final)
           </Link>
           <Link
             href="/pronosticos"

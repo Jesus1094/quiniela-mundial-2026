@@ -2,7 +2,9 @@
 // La estructura (Anexo C de FIFA) está fija aquí; los equipos se resuelven desde
 // las posiciones de grupo + asignación de terceros + ganadores previos.
 
-import type { TeamStanding } from "./standings";
+import { calcularPosiciones, rankearTerceros, type TeamStanding } from "./standings";
+import { GRUPOS } from "./teams";
+import type { Match } from "./matches";
 
 export type Ronda = "r32" | "r16" | "qf" | "sf" | "tercer" | "final";
 
@@ -174,6 +176,55 @@ export type ResolvedGame = {
   marcador_visitante: number | null;
   ganador: string | null;
 };
+
+// Construye el cuadro resuelto a partir de los datos crudos (partidos de grupo,
+// estado de eliminatoria y overrides de terceros). Centraliza la lógica usada
+// por la llave, el admin y los pronósticos de eliminatoria.
+export function construirCuadro(
+  matchesGrupo: Match[],
+  koRows: KoState[],
+  thirdsOverrides: { match_num: number; equipo: string }[]
+): Map<number, ResolvedGame> {
+  const posPorGrupo = new Map(
+    GRUPOS.map((g) => [
+      g.letra,
+      calcularPosiciones(
+        g.equipos.map((e) => e.nombre),
+        matchesGrupo.filter((m) => m.grupo === g.letra)
+      ),
+    ])
+  );
+  const terc8: Tercero[] = rankearTerceros(
+    GRUPOS.map((g) => {
+      const p = posPorGrupo.get(g.letra)!.find((x) => x.pos === 3)!;
+      return { ...p, grupo: g.letra };
+    })
+  )
+    .slice(0, 8)
+    .map((t) => ({ grupo: t.grupo, team: t.team }));
+  const overrides = new Map(thirdsOverrides.map((t) => [t.match_num, t.equipo]));
+  const { mapa } = asignarTerceros(terc8, overrides);
+  const koMap = new Map<number, KoState>(koRows.map((k) => [k.num, k]));
+  return resolverCuadro(posPorGrupo, koMap, mapa);
+}
+
+// Cierre de pronóstico de un partido de eliminatoria: 30 min antes del kickoff.
+export function cierreKo(num: number): Date | null {
+  const s = KO_SCHEDULE[num];
+  if (!s) return null;
+  return new Date(new Date(s.kickoff).getTime() - 30 * 60_000);
+}
+
+// Un partido de eliminatoria es pronosticable si ya se conocen sus dos equipos
+// y aún no llega el cierre.
+export function koPronosticable(
+  g: ResolvedGame,
+  now: Date = new Date()
+): boolean {
+  if (!g.home || !g.away) return false;
+  const c = cierreKo(g.num);
+  return !!c && now.getTime() < c.getTime();
+}
 
 function labelSrc(src: Src): string {
   if (src.t === "pos") return `${src.p}º Grupo ${src.g}`;
