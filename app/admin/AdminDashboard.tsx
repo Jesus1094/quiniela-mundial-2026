@@ -602,10 +602,12 @@ function TabLlave({
   return (
     <div>
       <p className="mb-4 font-sans text-sm text-navy/60">
-        Captura el marcador y quién avanza en cada partido (el podio campeón /
-        subcampeón / 3º / 4º se escribe solo y puntúa la quiniela). Los terceros
-        se asignan automáticamente; puedes forzarlos abajo si difieren del cuadro
-        oficial.
+        Captura el <strong>marcador a los 90 minutos reglamentarios</strong> y
+        quién avanza (en caso de tiempo extra/penales, elige el ganador aparte;
+        los pronósticos se evalúan contra el marcador de los 90'). El podio
+        campeón / subcampeón / 3º / 4º se escribe solo y puntúa la quiniela. Los
+        terceros se asignan automáticamente; puedes forzarlos abajo si difieren
+        del cuadro oficial.
       </p>
 
       <details className="mb-5 rounded-xl border-2 border-navy/10 bg-navy/[0.03] p-3">

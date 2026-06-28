@@ -79,6 +79,10 @@ export default async function EliminatoriasPage({
           llave se abre <strong>cuando se conocen sus dos equipos</strong> y
           cierra 30 min antes de jugarse.
         </p>
+        <p className="mt-3 rounded-xl border-2 border-rojo/30 bg-rojo/5 px-4 py-2 font-sans text-sm font-semibold text-rojo">
+          ⏱️ El marcador es al término de los 90 minutos reglamentarios — no
+          cuenta el tiempo extra ni los penales.
+        </p>
         {score && (
           <div className="mt-3 inline-block rounded-2xl border-2 border-navy/10 bg-white px-5 py-2">
             <span className="font-sans text-xs font-semibold uppercase tracking-wider text-navy/50">
