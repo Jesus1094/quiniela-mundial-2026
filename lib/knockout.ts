@@ -83,7 +83,7 @@ export const BRACKET: BracketGame[] = [
 export const KO_SCHEDULE: Record<number, { kickoff: string; sede: string }> = {
   73: { kickoff: "2026-06-28T19:00:00Z", sede: "Inglewood (SoFi)" },
   74: { kickoff: "2026-06-29T20:30:00Z", sede: "Foxborough (Gillette)" },
-  75: { kickoff: "2026-06-30T00:00:00Z", sede: "Guadalupe (BBVA)" },
+  75: { kickoff: "2026-06-30T01:00:00Z", sede: "Guadalupe (BBVA)" },
   76: { kickoff: "2026-06-29T17:00:00Z", sede: "Houston (NRG)" },
   77: { kickoff: "2026-06-30T21:00:00Z", sede: "East Rutherford (MetLife)" },
   78: { kickoff: "2026-06-30T17:00:00Z", sede: "Arlington (AT&T)" },
