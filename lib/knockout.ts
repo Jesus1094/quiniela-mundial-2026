@@ -87,7 +87,7 @@ export const KO_SCHEDULE: Record<number, { kickoff: string; sede: string }> = {
   76: { kickoff: "2026-06-29T17:00:00Z", sede: "Houston (NRG)" },
   77: { kickoff: "2026-06-30T21:00:00Z", sede: "East Rutherford (MetLife)" },
   78: { kickoff: "2026-06-30T17:00:00Z", sede: "Arlington (AT&T)" },
-  79: { kickoff: "2026-07-01T00:00:00Z", sede: "Ciudad de México (Azteca)" },
+  79: { kickoff: "2026-07-01T01:00:00Z", sede: "Ciudad de México (Azteca)" },
   80: { kickoff: "2026-07-01T17:00:00Z", sede: "Atlanta (Mercedes-Benz)" },
   81: { kickoff: "2026-07-01T23:00:00Z", sede: "Santa Clara (Levi's)" },
   82: { kickoff: "2026-07-01T20:00:00Z", sede: "Seattle (Lumen)" },
