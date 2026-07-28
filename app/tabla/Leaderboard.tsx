@@ -17,8 +17,22 @@ export type Fila = {
   puntos_fases: number;
   puntos_comodin: number;
   puntos_partidos: number;
+  resultados_acertados: number;
+  marcadores_exactos: number;
   total: number;
 };
+
+// Orden oficial: total, luego desempate por resultados acertados, luego
+// marcadores exactos, y al final alfabético.
+export function ordenarFilas(filas: Fila[]): Fila[] {
+  return [...filas].sort(
+    (a, b) =>
+      b.total - a.total ||
+      b.resultados_acertados - a.resultados_acertados ||
+      b.marcadores_exactos - a.marcadores_exactos ||
+      a.nombre.localeCompare(b.nombre)
+  );
+}
 
 const MEDALLAS = ["🥇", "🥈", "🥉"];
 const HIGHLIGHT = [
@@ -43,7 +57,7 @@ export default function Leaderboard({
     const { data } = await supabase
       .from("participants")
       .select(
-        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, puntos_partidos, total)"
+        "id, nombre, pago_confirmado, scores(puntos_grupos, puntos_fases, puntos_comodin, puntos_partidos, resultados_acertados, marcadores_exactos, total)"
       );
     if (!data) return;
     const mapped: Fila[] = data.map((p: any) => {
@@ -56,6 +70,8 @@ export default function Leaderboard({
         puntos_fases: s?.puntos_fases ?? 0,
         puntos_comodin: s?.puntos_comodin ?? 0,
         puntos_partidos: s?.puntos_partidos ?? 0,
+        resultados_acertados: s?.resultados_acertados ?? 0,
+        marcadores_exactos: s?.marcadores_exactos ?? 0,
         total: s?.total ?? 0,
       };
     });
@@ -91,7 +107,7 @@ export default function Leaderboard({
     const f = soloConfirmados
       ? filas.filter((x) => x.pago_confirmado)
       : filas;
-    return [...f].sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre));
+    return ordenarFilas(f);
   }, [filas, soloConfirmados]);
 
   const confirmados = filas.filter((f) => f.pago_confirmado).length;

@@ -1,0 +1,46 @@
+<svg width="1360" height="1240" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+<style>
+.ser{font-family:Georgia,'Times New Roman',serif;}
+.san{font-family:'Segoe UI',Arial,sans-serif;}
+</style>
+<rect x="0" y="0" width="680" height="620" fill="#0C044D"/>
+<rect x="0" y="0" width="680" height="10" fill="#CA041A"/>
+<rect x="0" y="610" width="680" height="10" fill="#CA041A"/>
+
+<circle cx="52" cy="60" r="5" fill="#E9B949"/>
+<circle cx="632" cy="52" r="6" fill="#CA041A"/>
+<circle cx="628" cy="150" r="4" fill="#F5F0E8" opacity="0.4"/>
+<circle cx="46" cy="150" r="4" fill="#F5F0E8" opacity="0.4"/>
+
+<text class="san" x="340" y="52" text-anchor="middle" fill="#E9B949" font-size="15" font-weight="600" letter-spacing="5">DAYSTON CONSULTORES</text>
+<text class="ser" x="340" y="112" text-anchor="middle" fill="#F5F0E8" font-size="46" font-weight="700">Podio final</text>
+<text class="san" x="340" y="140" text-anchor="middle" fill="#F5F0E8" font-size="17" opacity="0.85">Quiniela Mundial 2026</text>
+<text class="san" x="340" y="168" text-anchor="middle" fill="#E9B949" font-size="15" font-weight="600">Campeón del Mundial: España</text>
+
+<!-- 1er lugar -->
+<rect x="50" y="196" width="580" height="88" rx="16" fill="#F5F0E8"/>
+<circle cx="104" cy="240" r="34" fill="#E9B949"/>
+<text class="ser" x="104" y="252" text-anchor="middle" fill="#0C044D" font-size="34" font-weight="700">1</text>
+<text class="ser" x="156" y="234" fill="#0C044D" font-size="24" font-weight="700">Matilde Sánchez</text>
+<text class="san" x="156" y="258" fill="#0C044D" font-size="13" opacity="0.6">208 pts · 60% del pozo</text>
+<text class="ser" x="608" y="248" text-anchor="end" fill="#CA041A" font-size="27" font-weight="700">$2,100</text>
+
+<!-- 2do lugar -->
+<rect x="50" y="298" width="580" height="88" rx="16" fill="#F5F0E8"/>
+<circle cx="104" cy="342" r="34" fill="#B9C0C9"/>
+<text class="ser" x="104" y="354" text-anchor="middle" fill="#0C044D" font-size="34" font-weight="700">2</text>
+<text class="ser" x="156" y="336" fill="#0C044D" font-size="24" font-weight="700">NAHELLA</text>
+<text class="san" x="156" y="360" fill="#0C044D" font-size="13" opacity="0.6">207 pts · 25% · desempate: 61 resultados</text>
+<text class="ser" x="608" y="350" text-anchor="end" fill="#CA041A" font-size="27" font-weight="700">$875</text>
+
+<!-- 3er lugar -->
+<rect x="50" y="400" width="580" height="88" rx="16" fill="#F5F0E8"/>
+<circle cx="104" cy="444" r="34" fill="#CD7F32"/>
+<text class="ser" x="104" y="456" text-anchor="middle" fill="#0C044D" font-size="34" font-weight="700">3</text>
+<text class="ser" x="156" y="438" fill="#0C044D" font-size="24" font-weight="700">Leonel Andrés Mata</text>
+<text class="san" x="156" y="462" fill="#0C044D" font-size="13" opacity="0.6">207 pts · 15% · desempate: 55 resultados</text>
+<text class="ser" x="608" y="452" text-anchor="end" fill="#CA041A" font-size="27" font-weight="700">$525</text>
+
+<text class="san" x="340" y="536" text-anchor="middle" fill="#F5F0E8" font-size="15">Pozo total: $3,500 · 10 participantes</text>
+<text class="san" x="340" y="560" text-anchor="middle" fill="#F5F0E8" font-size="12" opacity="0.6">Empate en 207 resuelto por mayor número de resultados acertados</text>
+</svg>

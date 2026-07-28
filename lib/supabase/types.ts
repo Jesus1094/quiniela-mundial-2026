@@ -152,6 +152,8 @@ export type Database = {
           puntos_fases: number;
           puntos_comodin: number;
           puntos_partidos: number;
+          resultados_acertados: number;
+          marcadores_exactos: number;
           total: number;
           updated_at: string;
         };
